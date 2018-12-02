@@ -60,6 +60,6 @@ for page in pages:
 # Merge all outputs into a single XLS file
 writer = pd.ExcelWriter('output.xlsx')
 for output in outputs:
-    output[1].to_excel(writer, output[0] + ' (Metadata)')
-    output[2].to_excel(writer, output[0] + ' (Source data)')
+    output[1].to_excel(writer, output[0] + ' (Metadata)', index=False)
+    output[2].to_excel(writer, output[0] + ' (Source data)', index=False)
 writer.save()
