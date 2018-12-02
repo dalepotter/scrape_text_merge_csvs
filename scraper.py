@@ -53,7 +53,6 @@ for page in pages:
     csv_absolute_path = urljoin(page, csv_relative_path.get('href'))
     csv_req = requests.get(csv_absolute_path)
     downloads_dataframe = pd.read_csv(StringIO(csv_req.text), sep=",")
-    output_dataframes.append(downloads_dataframe)
 
     # Add all output data to the output list as a tuple
     outputs.append((heading, metadata_dataframe, downloads_dataframe))
