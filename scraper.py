@@ -16,9 +16,8 @@ pages = [
     "https://www.ethnicity-facts-figures.service.gov.uk/british-population/demographics/working-age-population/latest"
     ]
 
-# Create an empty list variable for storing outputs
-output_text = []
-output_dataframes = []
+# Create an empty list variable for storing output data
+outputs = []
 
 # Loop over each of our defined pages
 for page in pages:
@@ -30,20 +29,38 @@ for page in pages:
     # Parse the response into BeautifulSoup for processing
     soup = BeautifulSoup(page_req.text, 'html.parser')
 
-    # Access the text (possibly specific items) - this is the first output1
 
-    # Find and access source CSV data - this is the second output
+    # Find page heading
+    heading = soup.find('h1', attrs={'class':'heading-large'}).text.strip()
+
+
+    # Find page metadata
+    metadata_element = soup.find('div', attrs={'class':'metadata'})
+    metadata_dataframe = pd.DataFrame()
+    cleaned_names = []
+    for i in metadata_element.find_all('dt'):
+        cleaned_names.append(i.text.strip())
+    cleaned_values = []
+    for i in metadata_element.find_all('dd'):
+        cleaned_values.append(i.text.strip())
+    metadata_dataframe['Metadata name'] = cleaned_names
+    metadata_dataframe['Metadata value'] = cleaned_values
+
+
+    # Find and access source CSV data
     downloads_elem = soup.find('div', attrs={'class':'downloads'})  # Get the content for the 'Downloads' div
     csv_relative_path = downloads_elem.find('a', attrs={'data-event-action':'Source data'})  # Get the content for the 'Downloads' div
     csv_absolute_path = urljoin(page, csv_relative_path.get('href'))
     csv_req = requests.get(csv_absolute_path)
-    dataframe = pd.read_csv(StringIO(csv_req.text), sep=",")
-    output_dataframes.append(dataframe)
+    downloads_dataframe = pd.read_csv(StringIO(csv_req.text), sep=",")
+    output_dataframes.append(downloads_dataframe)
 
-# Merge all outputs into an XLS
+    # Add all output data to the output list as a tuple
+    outputs.append((heading, metadata_dataframe, downloads_dataframe))
+
+# Merge all outputs into a single XLS file
 writer = pd.ExcelWriter('output.xlsx')
-sheet = 1
-for dataframe in output_dataframes:
-    dataframe.to_excel(writer, str(sheet))  # TODO replace sheet number with page title
-    sheet = sheet + 1  # Increment sheet number for next iteration
+for output in outputs:
+    output[1].to_excel(writer, output[0] + ' (Metadata)')
+    output[2].to_excel(writer, output[0] + ' (Source data)')
 writer.save()
