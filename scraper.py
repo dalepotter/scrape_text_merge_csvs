@@ -16,9 +16,9 @@ pages = [
     "https://www.ethnicity-facts-figures.service.gov.uk/british-population/demographics/working-age-population/latest"
     ]
 
-# Create some empty list variables for storing outputs
+# Create an empty list variable for storing outputs
 output_text = []
-output_csvs = []
+output_dataframes = []
 
 # Loop over each of our defined pages
 for page in pages:
@@ -37,7 +37,13 @@ for page in pages:
     csv_relative_path = downloads_elem.find('a', attrs={'data-event-action':'Source data'})  # Get the content for the 'Downloads' div
     csv_absolute_path = urljoin(page, csv_relative_path.get('href'))
     csv_req = requests.get(csv_absolute_path)
-    output_csvs.append(csv_req.text)
-    dataframe = pd.read_csv(csv_req.text, sep=",")
+    dataframe = pd.read_csv(StringIO(csv_req.text), sep=",")
+    output_dataframes.append(dataframe)
 
 # Merge all outputs into an XLS
+writer = pd.ExcelWriter('output.xlsx')
+sheet = 1
+for dataframe in output_dataframes:
+    dataframe.to_excel(writer, str(sheet))  # TODO replace sheet number with page title
+    sheet = sheet + 1  # Increment sheet number for next iteration
+writer.save()
