@@ -5,7 +5,7 @@
 
 import requests  # Makes and returns HTTP requests
 from bs4 import BeautifulSoup  # Parses HTML data
-from urlparse import urljoin  # Allows us to contruct URLs (this is needed for accessing the CSV files)
+from urllib.parse import urljoin  # Allows us to contruct URLs (this is needed for accessing the CSV files)
 from io import StringIO  # Allows CSV strings to be treated as if it were a standalone file
 import pandas as pd  # Data processing library
 
