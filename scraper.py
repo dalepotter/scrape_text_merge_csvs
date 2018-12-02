@@ -47,6 +47,20 @@ for page in pages:
     metadata_dataframe['Metadata value'] = cleaned_values
 
 
+    # Find data for each table that exists on the page
+    chart_download_elements = soup.findAll('p', {'class':'chart-download'})  # Get all p elements that contain info on downloading table data
+    chart_dataframes = []  # Make an empty variable for storing in-page table dataframes
+    for chart_download_element in chart_download_elements:  # Loop over each table download element
+        if 'Download table data (CSV)' not in chart_download_element.text.strip():
+            continue  # Filters out chart downloads that do not have a CSV table download option
+
+        chart_title = chart_download_element.find('a', attrs={'data-event-action':'Table as spreadsheet'}).get('data-event-label')
+        chart_csv_relative_path = chart_download_element.find('a', attrs={'data-event-action':'Table as spreadsheet'})
+        chart_csv_absolute_path = urljoin(page, chart_csv_relative_path.get('href'))
+        chart_csv_req = requests.get(chart_csv_absolute_path)
+        chart_dataframe = pd.read_csv(StringIO(chart_csv_req.text), sep=",")
+        chart_dataframes.append((chart_title, chart_dataframe))
+
     # Find and access source CSV data
     downloads_elem = soup.find('div', attrs={'class':'downloads'})  # Get the content for the 'Downloads' div
     csv_relative_path = downloads_elem.find('a', attrs={'data-event-action':'Source data'})  # Get the content for the 'Downloads' div
@@ -55,11 +69,13 @@ for page in pages:
     downloads_dataframe = pd.read_csv(StringIO(csv_req.text), sep=",")
 
     # Add all output data to the output list as a tuple
-    outputs.append((heading, metadata_dataframe, downloads_dataframe))
+    outputs.append((heading, metadata_dataframe, chart_dataframes, downloads_dataframe))
 
 # Merge all outputs into a single XLS file
 writer = pd.ExcelWriter('output.xlsx')
 for output in outputs:
     output[1].to_excel(writer, output[0] + ' (Metadata)', index=False)
-    output[2].to_excel(writer, output[0] + ' (Source data)', index=False)
+    for chart in output[2]:  # Add any in-page charts as seperate tab/s
+        chart[1].to_excel(writer, output[0] + ' (Table - ' + chart[0] + ')', index=False)
+    output[3].to_excel(writer, output[0] + ' (Source data)', index=False)
 writer.save()
