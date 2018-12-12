@@ -90,7 +90,7 @@ for page in pages:
     csv_absolute_path = urljoin(page, csv_relative_path.get('href'))
     csv_req = requests.get(csv_absolute_path)
     downloads_dataframe = pd.read_csv(StringIO(csv_req.text), sep=",")
-    sheets_to_output.append([page_title + ' (Source data)', downloads_dataframe])  # pandas dataframe
+    sheets_to_output.append([page_title + ' (Source data)', downloads_dataframe])  # str + pandas dataframe
 
 
 # Merge all outputs into a single XLS file
@@ -101,6 +101,7 @@ if not os.path.exists(output_path):
     empty_dataframe.to_excel(writer, 'Sheet1', index=False)
     writer.save()
 
+#  Open the existing output file
 writer = pd.ExcelWriter(output_path, engine='openpyxl')
 
 # Delete all existing sheets from within the workbook
