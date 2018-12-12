@@ -86,7 +86,7 @@ for page in pages:
         chart_csv_absolute_path = urljoin(page, chart_csv_relative_path.get('href'))
         chart_csv_req = requests.get(chart_csv_absolute_path)
         chart_dataframe = pd.read_csv(StringIO(chart_csv_req.text), sep=",")
-        sheets_to_output.append([chart_title, chart_dataframe])
+        sheets_to_output.append([page_title + ' - ' + chart_title, chart_dataframe])
 
     # Find and access source CSV data
     downloads_elem = soup.find('div', attrs={'class':'downloads'})  # Get the content for the 'Downloads' div
