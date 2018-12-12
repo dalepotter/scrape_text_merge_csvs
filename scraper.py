@@ -35,8 +35,8 @@ for page in pages:
     soup = BeautifulSoup(page_req.text, 'html.parser')
 
 
-    # Find page heading
-    heading = soup.find('h1', attrs={'class':'heading-large'}).text.strip()
+    # Find page page title
+    page_title = soup.find('h1', attrs={'class':'heading-large'}).text.strip()
 
 
     # Find page metadata
@@ -76,7 +76,7 @@ for page in pages:
     # Add all output data to the output list as a tuple
     outputs.append(
         (
-            heading,  # string
+            page_title,  # string
             metadata_dataframe,  # pandas dataframe
             chart_dataframes,  # pandas dataframe
             downloads_dataframe  # pandas dataframe
