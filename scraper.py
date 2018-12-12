@@ -19,7 +19,7 @@ pages = [
     ]
 
 # Define the file name for the output xlsx file
-output_path = 'output1234.xlsx'
+output_path = 'output.xlsx'
 
 # Create an empty list variable for storing output data
 # This will contain a list of lists
