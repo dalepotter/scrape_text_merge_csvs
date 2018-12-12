@@ -22,8 +22,8 @@ pages = [
 output_path = 'output1234.xlsx'
 
 # Create an empty list variable for storing output data
-# This will contain a list of tuples
-outputs = []
+# This will contain a list of lists
+sheets_to_output = []
 
 # Loop over each of our defined pages
 for page in pages:
@@ -51,6 +51,7 @@ for page in pages:
         cleaned_values.append(i.text.strip())
     metadata_dataframe['Metadata name'] = cleaned_names
     metadata_dataframe['Metadata value'] = cleaned_values
+    sheets_to_output.append([page_title + ' (Metadata)', metadata_dataframe])  # str + pandas dataframe
 
 
     """
@@ -81,7 +82,7 @@ for page in pages:
         chart_csv_absolute_path = urljoin(page, chart_csv_relative_path.get('href'))
         chart_csv_req = requests.get(chart_csv_absolute_path)
         chart_dataframe = pd.read_csv(StringIO(chart_csv_req.text), sep=",")
-        chart_dataframes.append((chart_title, chart_dataframe))
+        sheets_to_output.append([chart_title, chart_dataframe])
 
     # Find and access source CSV data
     downloads_elem = soup.find('div', attrs={'class':'downloads'})  # Get the content for the 'Downloads' div
@@ -89,16 +90,7 @@ for page in pages:
     csv_absolute_path = urljoin(page, csv_relative_path.get('href'))
     csv_req = requests.get(csv_absolute_path)
     downloads_dataframe = pd.read_csv(StringIO(csv_req.text), sep=",")
-
-    # Add all output data to the output list as a tuple
-    outputs.append(
-        (
-            page_title,  # string
-            metadata_dataframe,  # pandas dataframe
-            chart_dataframes,  # pandas dataframe
-            downloads_dataframe  # pandas dataframe
-        )
-    )
+    sheets_to_output.append([page_title + ' (Source data)', downloads_dataframe])  # pandas dataframe
 
 
 # Merge all outputs into a single XLS file
@@ -119,9 +111,6 @@ for sheet in sheet_names:  # Iterate over each sheet
     writer.book.remove_sheet(std)  # Delete the sheet
 
 # TODO: Strip sheet names to 31 characters (and add sheet name to cell A1 of the sheet)
-for output in outputs:
-    output[1].to_excel(writer, output[0] + ' (Metadata)', index=False)
-    for chart in output[2]:  # Add any in-page charts as seperate tab/s
-        chart[1].to_excel(writer, output[0] + ' (Table - ' + chart[0] + ')', index=False)
-    output[3].to_excel(writer, output[0] + ' (Source data)', index=False)
+for sheet in sheets_to_output:
+    sheet[1].to_excel(writer, sheet[0], index=False)
 writer.save()
