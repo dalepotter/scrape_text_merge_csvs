@@ -21,6 +21,7 @@ pages = [
 output_path = 'output1234.xlsx'
 
 # Create an empty list variable for storing output data
+# This will contain a list of tuples
 outputs = []
 
 # Loop over each of our defined pages
@@ -73,7 +74,14 @@ for page in pages:
     downloads_dataframe = pd.read_csv(StringIO(csv_req.text), sep=",")
 
     # Add all output data to the output list as a tuple
-    outputs.append((heading, metadata_dataframe, chart_dataframes, downloads_dataframe))
+    outputs.append(
+        (
+            heading,  # string
+            metadata_dataframe,  # pandas dataframe
+            chart_dataframes,  # pandas dataframe
+            downloads_dataframe  # pandas dataframe
+        )
+    )
 
 
 # Merge all outputs into a single XLS file
