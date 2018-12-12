@@ -12,10 +12,10 @@ import pandas as pd  # Data processing library
 
 
 # Define a list of given pages
-# TODO Add an extra page
 pages = [
     "https://www.ethnicity-facts-figures.service.gov.uk/british-population/demographics/male-and-female-populations/latest",
-    "https://www.ethnicity-facts-figures.service.gov.uk/british-population/demographics/working-age-population/latest"
+    "https://www.ethnicity-facts-figures.service.gov.uk/british-population/demographics/working-age-population/latest",
+    "https://www.ethnicity-facts-figures.service.gov.uk/british-population/demographics/socioeconomic-status/latest"
     ]
 
 # Define the file name for the output xlsx file
