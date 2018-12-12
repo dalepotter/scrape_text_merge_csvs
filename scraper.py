@@ -17,6 +17,9 @@ pages = [
     "https://www.ethnicity-facts-figures.service.gov.uk/british-population/demographics/working-age-population/latest"
     ]
 
+# Define the file name for the output xlsx file
+output_path = 'output1234.xlsx'
+
 # Create an empty list variable for storing output data
 outputs = []
 
@@ -75,14 +78,14 @@ for page in pages:
 
 # Merge all outputs into a single XLS file
 # Create an empty output.xlsx file if one does not already exist
-if not os.path.exists('output1234.xlsx'):
-    writer = pd.ExcelWriter('output1234.xlsx')
+if not os.path.exists(output_path):
+    writer = pd.ExcelWriter(output_path)
     empty_dataframe = pd.DataFrame()
     empty_dataframe.to_excel(writer, 'Sheet1', index=False)
     writer.save()
 
-writer = pd.ExcelWriter('output1234.xlsx', engine='openpyxl')
-writer.book = load_workbook('output1234.xlsx')  # Open the existing workbook
+writer = pd.ExcelWriter(output_path, engine='openpyxl')
+writer.book = load_workbook(output_path)  # Open the existing workbook
 for output in outputs:
     output[1].to_excel(writer, output[0] + ' (Metadata)', index=False)
     for chart in output[2]:  # Add any in-page charts as seperate tab/s
