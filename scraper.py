@@ -110,8 +110,14 @@ if not os.path.exists(output_path):
     writer.save()
 
 writer = pd.ExcelWriter(output_path, engine='openpyxl')
-# TODO: Delete all existing sheets from within the workbook
+
+# Delete all existing sheets from within the workbook
 writer.book = load_workbook(output_path)  # Open the existing workbook
+sheet_names = writer.book.get_sheet_names()  # Get the name of every existing sheet within the workbook
+for sheet in sheet_names:  # Iterate over each sheet
+    std = writer.book.get_sheet_by_name(sheet)  # Load the sheet
+    writer.book.remove_sheet(std)  # Delete the sheet
+
 # TODO: Strip sheet names to 31 characters (and add sheet name to cell A1 of the sheet)
 for output in outputs:
     output[1].to_excel(writer, output[0] + ' (Metadata)', index=False)
