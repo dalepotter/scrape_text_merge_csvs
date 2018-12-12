@@ -12,6 +12,7 @@ import pandas as pd  # Data processing library
 
 
 # Define a list of given pages
+# TODO Add an extra page
 pages = [
     "https://www.ethnicity-facts-figures.service.gov.uk/british-population/demographics/male-and-female-populations/latest",
     "https://www.ethnicity-facts-figures.service.gov.uk/british-population/demographics/working-age-population/latest"
@@ -50,6 +51,22 @@ for page in pages:
         cleaned_values.append(i.text.strip())
     metadata_dataframe['Metadata name'] = cleaned_names
     metadata_dataframe['Metadata value'] = cleaned_values
+
+
+    """
+    TODO: Scrape page content
+        - Approach 1: Look programatically for content
+            - for each section
+                - if text, parse to dataframe
+                - if image, get png and save
+                - if in-page chart, get corresponding CSVs and store as a dataframe
+            - ensure source CSVs are obtained (could use the current code)
+        - Approach 2: Get blocks of content by hardcoded IDs
+            - Get summary text
+            - Get 'Things you need to know'
+            - etc...
+    """
+
 
 
     # Find data for each table that exists on the page
@@ -93,7 +110,9 @@ if not os.path.exists(output_path):
     writer.save()
 
 writer = pd.ExcelWriter(output_path, engine='openpyxl')
+# TODO: Delete all existing sheets from within the workbook
 writer.book = load_workbook(output_path)  # Open the existing workbook
+# TODO: Strip sheet names to 31 characters (and add sheet name to cell A1 of the sheet)
 for output in outputs:
     output[1].to_excel(writer, output[0] + ' (Metadata)', index=False)
     for chart in output[2]:  # Add any in-page charts as seperate tab/s
