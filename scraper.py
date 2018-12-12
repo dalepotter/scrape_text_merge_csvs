@@ -56,20 +56,22 @@ for page in pages:
     sheets_to_output.append([page_title + ' (Metadata)', metadata_dataframe])  # str + pandas dataframe
 
 
-    """
-    TODO: Scrape page content
-        - Approach 1: Look programatically for content
-            - for each section
-                - if text, parse to dataframe
-                - if image, get png and save
-                - if in-page chart, get corresponding CSVs and store as a dataframe
-            - ensure source CSVs are obtained (could use the current code)
-        - Approach 2: Get blocks of content by hardcoded IDs
-            - Get summary text
-            - Get 'Things you need to know'
-            - etc...
-    """
-
+    # Get textual page content
+    grid_elements = soup.find_all('div', {'class':'grid-row'})
+    num = 1
+    for row in grid_elements:
+        if not any([  # Exclude divs which contain any of the following elements
+                row.find('nav'),  # Navigation menu
+                row.find('h1', {'class':'heading-large'}),  # Page title
+                row.find('div', {'class':'metadata'}),  # Metadata
+                row.find('div', {'class':'share'})  # Social media share links
+            ]):
+            dataframe = pd.DataFrame()
+            dataframe.loc[0,0] = row.text.strip()
+            dataframe_name = page_title + ' Text' + str(num)
+            num += 1
+            output = [dataframe_name, dataframe]
+            sheets_to_output.append([dataframe_name, dataframe])  # str + pandas dataframe
 
 
     # Find data for each table that exists on the page
