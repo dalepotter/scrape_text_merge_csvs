@@ -2,11 +2,12 @@
 # Ensure we are running as python 3.6 in pythonanywhere
 
 # Import required libraries
-
+import os  # Allows python to interact with the operating system - e.g. check if files exist
 import requests  # Makes and returns HTTP requests
 from bs4 import BeautifulSoup  # Parses HTML data
 from urllib.parse import urljoin  # Allows us to contruct URLs (this is needed for accessing the CSV files)
 from io import StringIO  # Allows CSV strings to be treated as if it were a standalone file
+from openpyxl import load_workbook  # Python Excel library to load an existing xlsx file
 import pandas as pd  # Data processing library
 
 
@@ -71,8 +72,17 @@ for page in pages:
     # Add all output data to the output list as a tuple
     outputs.append((heading, metadata_dataframe, chart_dataframes, downloads_dataframe))
 
+
 # Merge all outputs into a single XLS file
-writer = pd.ExcelWriter('output.xlsx')
+# Create an empty output.xlsx file if one does not already exist
+if not os.path.exists('output1234.xlsx'):
+    writer = pd.ExcelWriter('output1234.xlsx')
+    empty_dataframe = pd.DataFrame()
+    empty_dataframe.to_excel(writer, 'Sheet1', index=False)
+    writer.save()
+
+writer = pd.ExcelWriter('output1234.xlsx', engine='openpyxl')
+writer.book = load_workbook('output1234.xlsx')  # Open the existing workbook
 for output in outputs:
     output[1].to_excel(writer, output[0] + ' (Metadata)', index=False)
     for chart in output[2]:  # Add any in-page charts as seperate tab/s
