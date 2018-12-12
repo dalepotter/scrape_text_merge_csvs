@@ -38,6 +38,8 @@ for page in pages:
 
     # Find page page title
     page_title = soup.find('h1', attrs={'class':'heading-large'}).text.strip()
+    if len(page_title) > 20: # Shorten page title if it is too long
+        page_title = page_title[0:19]
 
 
     # Find page metadata
@@ -111,7 +113,12 @@ for sheet in sheet_names:  # Iterate over each sheet
     std = writer.book.get_sheet_by_name(sheet)  # Load the sheet
     writer.book.remove_sheet(std)  # Delete the sheet
 
-# TODO: Strip sheet names to 31 characters (and add sheet name to cell A1 of the sheet)
 for sheet in sheets_to_output:
-    sheet[1].to_excel(writer, sheet[0], index=False)
+    sheet_title = sheet[0][0:31]  # Strip sheet name to 31 characters
+    output_dataframe = sheet[1]
+    # TODO: Add sheet name to cell A1 of the sheet)
+    #output_dataframe.loc[-1, 1] = sheet[0] # Insert the full sheet title at the top of the dataframe
+    #output_dataframe.index = output_dataframe.index + 1  # Shifting the dataframe index
+    #output_dataframe = output_dataframe.sort_index()  # Sorting by the index
+    output_dataframe.to_excel(writer, sheet_title, index=False)
 writer.save()
