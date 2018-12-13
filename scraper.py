@@ -68,7 +68,9 @@ for page in pages:
                 row.find('nav'),  # 'nav' elements contain the breadcrumb/navigation menu - this is not needed
                 row.find('h1', {'class':'heading-large'}),  # Contains the page title - this is captured elsewhere
                 row.find('div', {'class':'metadata'}),  # Contains page metadata - this is captured elsewhere
-                row.find('div', {'class':'share'})  # Contains social media share links - this is not needed
+                row.find('div', {'class':'share'}),  # Contains social media share links - this is not needed
+                'footer-categories' in row.get('class')  # If this 'grid-row' element also contains a class of 'footer-categories',
+                                                         # then this row element will contain data at the end of the page - this is not needed
             ]):
             dataframe = pd.DataFrame()  # Create an empty pandas dataframe that will represent a sheet of text within this grid element
             dataframe.loc[0,0] = row.text.strip()  # Add the text content of this 'grid-row' element to the first cell of the dataframe
